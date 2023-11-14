@@ -1,0 +1,13 @@
+ul{
+    display: flex;
+    flex-flow: row wrap;
+    list-style: none;
+    padding: 0;
+}
+li {
+    flex: 1 1 300px;
+    max-height: 200px;
+    border: 1px solid;
+    border-radius: 8px;
+    overflow: auto;
+}

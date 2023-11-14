@@ -1,6 +1,6 @@
 //Initialization
 const COHORT = "2308-ACC-PT-WEB-PT-A";
-const API_URL = `https://fsa-async-await.herokuapp.com/api/2308-ACC-PT-WEB-PT-A/parties`;
+const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/events`;
 
  const state = {
     parties: [],
@@ -11,7 +11,7 @@ const API_URL = `https://fsa-async-await.herokuapp.com/api/2308-ACC-PT-WEB-PT-A/
 
  const addPartyForm = document.querySelector("#addParty");
  // Event listener
- addPartyForm.addEventListener("submit", addParties);
+ addPartyForm.addEventListener("submit", addParty);
 
  //Sync state with the API and rerender
  async function render() {
@@ -35,27 +35,32 @@ const API_URL = `https://fsa-async-await.herokuapp.com/api/2308-ACC-PT-WEB-PT-A/
 
 function renderParties() {
     if (!state.parties.length) {
-    partiesList.innerHTML = "<li>No artists.</li>";
+    partyList.innerHTML = "<li>No artists.</li>";
     return;
     }
 
     const partiesCards = state.parties.map((party) => {
     const li = document.createElement("li");
     li.innerHTML = `
-        <h2>${party.names}</h2>
-        <p>${party.dates}</p>
-        <p>${party.times}</p>
-        <p>${party.locations}</p>
+        <h2>${party.name}</h2>
+        <p>${party.date}</p>
+        <p>${party.location}</p>
         <p>${party.description}</p>
+        <p>${party.id}</p>
     `;
-    return li;
-    });
+   
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete Me";
+    li.append(deleteButton);
 
-    partiesList.replaceChildren(...patiesCards);
-}
+    deleteButton.addEventListener("click", () => deleteParty(party.id));
+    return li;
+  });
+  partyList.replaceChildren(...partiesCards);
+};
 
 async function addParty(event){
-  event.preventDefuald();
+  event.preventDefault();
 
   try{
     const response = await fetch(API_URL, {
@@ -64,18 +69,33 @@ async function addParty(event){
       body:JSON.stringify({
         name: addPartyForm.name.value,
         date: addPartyForm.date.value,
-        time: addPartyForm.time.value,
-        lication: addPartyForm.location.value,
-        discription: addPartyForm.discription.value,
+        location: addPartyForm.location.value,
+        description: addPartyForm.description.value,
       }),
     });
     if(!response.ok){
       throw new Error("Failed to create party")
     }
+    //add more specific error handling for different types of failures like network issues or validation error.
     render();
   }
   catch(error){
     console.error(error);
   }
 }
-  
+ 
+async function deleteParty(partyId) {
+  try {
+      const response = await fetch(`${API_URL}/${partyId}`, {
+          method: 'DELETE'
+      });
+
+      if (!response.ok) {
+          throw new Error('Failed to delete party');
+      }
+
+      render(); // Re-render the parties list to reflect the deletion
+  } catch (error) {
+      console.error(error);
+  }
+}
