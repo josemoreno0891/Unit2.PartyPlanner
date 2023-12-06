@@ -10,4 +10,5 @@ li {
     border: 1px solid;
     border-radius: 8px;
     overflow: auto;
+    font-size: 10px;
 }
